@@ -17,10 +17,12 @@ PIXEL_SPACING = 0.15
 COLOR_ORDER = [ constants.COLOR_R, constants.COLOR_G, constants.COLOR_B ]
 
 # maximum permissible post-termination hack runtime, in microseconds
-#MAX_DWELL = 4000000
 MAX_DWELL = 1000000
 
-# time per screenhack, in seconds
+# maximum time allowed per hack, in decimal seconds
+MAX_RUN = 30.0
+
+# default time per hack, in decimal seconds
 TIME_SLICE = 5.0
 
 #=======================================================================

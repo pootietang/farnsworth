@@ -12,7 +12,7 @@ last_string = ""
 
 sign = farnsworth.sign( provides_logo=False,
                         is_dynamic=True,
-                        preferred_duration=15.0 )
+                        preferred_duration=60.0 )
 
 while True:
 

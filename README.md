@@ -5,7 +5,8 @@ text and graphics library for openpixelcontrol-compatible LED signage
 
 ###configuration
 
-####config.py
+general, systemwide configuration is accomplished by editing the
+config.py file
 
 set the ip address to "localhost" if you're running a local opengl
 simulator; otherwise, set the ip address of the openpixelcontrol target
@@ -49,7 +50,15 @@ time before having its process forcibly killed, in microseconds
 MAX_DWELL = 1000000
 ```
 
-set the default time allotted to hacks that don't specify a duration
+set the maximum runtime a hack will be allowed to schedule. hacks
+requesting longer time slices will be run this long, in decimal seconds
+
+```python
+MAX_RUN = 30.0
+```
+
+set the default time allotted to hacks that don't specify a duration, in
+decimal seconds
 
 ```python
 TIME_SLICE = 5.0
