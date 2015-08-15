@@ -15,12 +15,19 @@ import config
 
 ########################################################################
 
+MAX_X = 79
+MAX_Y = 23
+
 STATUS_LINE_Y = 20
 STATUS_LINE_X = 1
 
-MSG_WINDOW_LINE_CT = 6
+HACK_WINDOW_LINE_CT = 8
+HACK_WINDOW_X = 1
+HACK_WINDOW_Y = 3
+
+MSG_WINDOW_LINE_CT = 10
 MSG_WINDOW_X = 1
-MSG_WINDOW_Y = 22
+MSG_WINDOW_Y = 12
 
 ########################################################################
 
@@ -41,7 +48,30 @@ def setup_screen():
   curses.noecho()
   curses.cbreak()
   curses.curs_set(0)
+  stdscr.nodelay(1)
   stdscr.keypad(1)
+  msg_win = stdscr.subwin(MAX_Y, MAX_X, 0, 0)
+  msg_win.box()
+  msg_win.hline(2, 1, curses.ACS_HLINE, 77)
+  msg_win.hline(HACK_WINDOW_LINE_CT+3, 1, curses.ACS_HLINE, 77)
+  
+########################################################################
+
+hack_list_idx = 0
+def paint_hack_list():
+  global stdscr
+
+  for i in range(HACK_WINDOW_LINE_CT):
+    cursor = i + hack_list_idx
+    if cursor >= len(screenhacks):
+      cursor -= len(screenhacks)
+
+    if i == selected_hack:
+      stdscr.addstr(HACK_WINDOW_Y + i, HACK_WINDOW_X, screenhacks[cursor]["name"], curses.A_REVERSE)
+    else:
+      stdscr.addstr(HACK_WINDOW_Y + i, HACK_WINDOW_X, screenhacks[cursor]["name"])
+
+  stdscr.refresh()
 
 ########################################################################
 
@@ -58,7 +88,8 @@ def log_msg(msg):
     cursor = i + msg_idx
     if cursor >= len(msg_buffer):
       cursor -= len(msg_buffer)
-    stdscr.addstr(MSG_WINDOW_Y + i, MSG_WINDOW_X, msg_buffer[cursor])
+    pstr = msg_buffer[cursor] + " " * ( MAX_X - (len(msg_buffer[cursor])+2) )
+    stdscr.addstr(MSG_WINDOW_Y + i, MSG_WINDOW_X, pstr, curses.A_REVERSE)
 
   stdscr.refresh()
   
@@ -135,6 +166,24 @@ def random_hack():
 
 ########################################################################
 
+selected_hack = 0
+
+def hack_up():
+  global selected_hack
+  if selected_hack > 0:
+    selected_hack -= 1
+    paint_hack_list()
+
+def hack_down():
+  global selected_hack, hack_list_idx
+  if selected_hack < len(screenhacks) - 1:
+    selected_hack += 1
+    if selected_hack >= HACK_WINDOW_LINE_CT + hack_list_idx:
+      hack_list_idx += 1
+    paint_hack_list()
+
+########################################################################
+
 def next_hack():
   global hack_index
 
@@ -189,6 +238,8 @@ setup_screen()
 
 load_hacks()
 
+paint_hack_list()
+
 hack = start_next_hack()
 
 while True:
@@ -196,6 +247,12 @@ while True:
   ch = stdscr.getch()
   if ch == ord('q'):
     break
+  elif ch == curses.KEY_ENTER:
+    pass
+  elif ch == curses.KEY_DOWN:
+    hack_down()
+  elif ch == curses.KEY_UP:
+    hack_up()
 
   elapsed = time() - hack["start_time"]
   if elapsed > hack["preferred_duration"]:
