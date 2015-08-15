@@ -18,16 +18,19 @@ import config
 MAX_X = 79
 MAX_Y = 23
 
-STATUS_LINE_Y = 1
-STATUS_LINE_X = 1
+STATUS_WINDOW_Y = 1
+STATUS_WINDOW_X = 2
+STATUS_WINDOW_W = 75
 
 HACK_WINDOW_LINE_CT = 8
-HACK_WINDOW_X = 1
+HACK_WINDOW_X = 2
 HACK_WINDOW_Y = 3
+HACK_WINDOW_W = 75
 
 MSG_WINDOW_LINE_CT = 10
-MSG_WINDOW_X = 1
+MSG_WINDOW_X = 2
 MSG_WINDOW_Y = 12
+MSG_WINDOW_W = 75
 
 ########################################################################
 
@@ -66,10 +69,15 @@ def paint_hack_list():
     if cursor >= len(screenhacks):
       cursor -= len(screenhacks)
 
-    if i == selected_hack:
-      stdscr.addstr(HACK_WINDOW_Y + i, HACK_WINDOW_X, screenhacks[cursor]["name"], curses.A_REVERSE)
+    t = screenhacks[cursor]["name"]
+    w = MAX_X - (len(t)+HACK_WINDOW_X*2)
+    t = t + " " * w
+    t = t[:HACK_WINDOW_W]
+
+    if cursor == selected_hack:
+      stdscr.addstr(HACK_WINDOW_Y + i, HACK_WINDOW_X, t, curses.A_REVERSE)
     else:
-      stdscr.addstr(HACK_WINDOW_Y + i, HACK_WINDOW_X, screenhacks[cursor]["name"])
+      stdscr.addstr(HACK_WINDOW_Y + i, HACK_WINDOW_X, t)
 
   stdscr.refresh()
 
@@ -77,27 +85,37 @@ def paint_hack_list():
 
 msg_buffer = [" "] * MSG_WINDOW_LINE_CT
 msg_idx = 0
+
 def log_msg(msg):
   global msg_buffer, msg_idx, stdscr
+  
   msg_buffer[msg_idx] = msg
+  
+  cursor_offset = msg_idx - MSG_WINDOW_LINE_CT + 1
+  for i in range(MSG_WINDOW_LINE_CT):
+    cursor = cursor_offset + i
+    if cursor >= len(msg_buffer):
+      cursor -= len(msg_buffer)
+    msg_w = MAX_X - (len(msg_buffer[cursor])+MSG_WINDOW_X*2)
+    pstr = msg_buffer[cursor] + " " * msg_w
+    stdscr.addstr(MSG_WINDOW_Y + i, MSG_WINDOW_X, pstr[:HACK_WINDOW_W])
+
+  stdscr.refresh()
+
   msg_idx += 1
   if msg_idx == len(msg_buffer):
     msg_idx = 0
 
-  for i in range(MSG_WINDOW_LINE_CT):
-    cursor = i + msg_idx
-    if cursor >= len(msg_buffer):
-      cursor -= len(msg_buffer)
-    pstr = msg_buffer[cursor] + " " * ( MAX_X - (len(msg_buffer[cursor])+2) )
-    stdscr.addstr(MSG_WINDOW_Y + i, MSG_WINDOW_X, pstr, curses.A_REVERSE)
-
-  stdscr.refresh()
-  
 ########################################################################
 
 def set_status(msg):
   global stdscr
-  stdscr.addstr(STATUS_LINE_Y, STATUS_LINE_X, msg, curses.A_REVERSE)
+
+  w = MAX_X - (len(msg)+STATUS_WINDOW_X*2)
+  msg = msg + " " * w
+  msg = msg[:STATUS_WINDOW_W]
+
+  stdscr.addstr(STATUS_WINDOW_Y, STATUS_WINDOW_X, msg)
   stdscr.refresh()
 
 ########################################################################
@@ -135,11 +153,11 @@ def register_hack( path ):
     found_dynamic = True
 
   log_msg( "  %s: %s" % (len(screenhacks), hack["name"]) )
-  log_msg( "	provides_logo: %s	is_dynamic: %s" % (settings[0] == "True", settings[1] == "True") )
+  log_msg( "    provides_logo: %s    is_dynamic: %s" % (settings[0] == "True", settings[1] == "True") )
 
   if hack["preferred_duration"] > config.MAX_RUN:
     hack["preferred_duration"] = config.MAX_RUN
-    log_msg( "	requested time of %s seconds abbreviated to %s seconds" % (settings[2],config.MAX_RUN) )
+    log_msg( "    requested time of %s seconds abbreviated to %s seconds" % (settings[2],config.MAX_RUN) )
 
   screenhacks.append( hack )
   
@@ -169,9 +187,11 @@ def random_hack():
 selected_hack = 0
 
 def hack_up():
-  global selected_hack
+  global selected_hack, hack_list_idx
   if selected_hack > 0:
     selected_hack -= 1
+    if selected_hack < hack_list_idx:
+      hack_list_idx -= 1
     paint_hack_list()
 
 def hack_down():
@@ -208,7 +228,7 @@ def next_hack():
   
 ########################################################################
 def load_hacks():
-  set_status("finding hacks...")
+  set_status("LOADING HACKS...")
   for root, dirnames, filenames in walk(hacks_dir):
     for filename in fnmatch.filter(filenames, '*.py'):
       register_hack(join(root, filename))
@@ -221,7 +241,7 @@ def start_next_hack():
   hack["termination_clock"] = 0
   hack["state"] = constants.ST_RUNNING
   hack["proc"] = Popen( [hack["path"],"--time",str(config.TIME_SLICE)] )
-  set_status(" RUNNING %s " % hack["name"])
+  set_status("RUNNING %s " % hack["name"])
   log_msg( "starting %s; will run for %s secs" % (hack["name"],hack["preferred_duration"]) )
   runs = ""
   wt = ""
@@ -259,7 +279,7 @@ while True:
     # the currently running screenhack has run out of time
     if hack["state"] == constants.ST_RUNNING:
       # request exit
-      log_msg("requesting exit of %s" % hack["name"])
+      set_status("REQUESTING EXIT of %s" % hack["name"])
       hack["proc"].terminate()
       hack["state"] = constants.ST_TERMINATING
     elif hack["state"] == constants.ST_TERMINATING:
@@ -272,7 +292,7 @@ while True:
         if hack["termination_clock"] > config.MAX_DWELL:
           # the screenhack is taking too long to terminate
           # shoot it in the head
-          log_msg("%s taking too long to exit; killing" % hack["name"])
+          set_status("KILLING %s" % hack["name"])
           hack["proc"].kill()
 
   sleep(0.001)
