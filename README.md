@@ -74,7 +74,10 @@ terminal is too small, you'll be limited to non-interactive silent mode.
 
 ###interactive mode
 interactive mode exposes the jukebox's internal state and allows you to
-control it manually as desired.
+control it manually as desired. two operating modes are possible:
+
+* auto -- hacks are cycled automatically
+* manual -- hacks run indefinitely, changing only when directed by user
 
 each hack in the listing is preceded by two properties:
 * **R**un count -- how many times this hack has been displayed so far
@@ -84,7 +87,7 @@ key | function
 ----|---------
 q | shutdown the farnsworth system
 r | rescan hacks folder so as to make newly-added hacks available
-m | toggle manual mode, in which each hack runs until a new one is selected
+m | toggle between auto and manual modes
 [enter] | stop the current hack and (re)load the highlighted one
 [down arrow] | move the hack selection downwards
 [up arrow] | move the hack selection upwards
