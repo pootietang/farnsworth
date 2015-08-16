@@ -1,12 +1,13 @@
 # farnsworth
----
-the central jukebox script cycles through the individual hack scripts
-stored in the hacks folder. the farnsworth library provides the
-individual hack scripts with common functionality such as character
-generation, bitmap loading, and sprites with animation and tweening.
+the central jukebox script schedules and transitions between the
+individual "hack" scripts that are responsible for actually painting
+the display.
+
+the farnsworth library provides the individual hack scripts with common
+functionality such as character generation, bitmap loading, and sprites
+with animation and tweening.
 
 ##configuration
----
 general, systemwide configuration is accomplished by editing the
 config.py file
 
@@ -67,13 +68,11 @@ TIME_SLICE = 5.0
 ```
 
 ##invocation
----
 run the start_jukebox.sh script to initialize farnsworth. by default,
 farnsworth's jukebox provides an interactive curses interface. if your
 terminal is too small, you'll be limited to non-interactive silent mode.
 
 ###interactive mode
----
 interactive mode exposes the jukebox's internal state and allows you to
 control it manually as desired.
 
