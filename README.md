@@ -79,6 +79,6 @@ key | function
 q | shutdown the farnsworth system
 r | rescan hacks folder so as to make newly-added hacks available
 m | toggle manual mode, in which each hack runs until a new one is selected
-<enter> | stop the current hack and (re)load the highlighted one
-<down arrow> | move the hack selection downwards
-<up arrow> | move the hack selection upwards
+[enter] | stop the current hack and (re)load the highlighted one
+[down arrow] | move the hack selection downwards
+[up arrow] | move the hack selection upwards
