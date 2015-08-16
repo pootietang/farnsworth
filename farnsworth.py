@@ -9,6 +9,7 @@ import math
 import random
 import os
 import sys
+import signal
 import opc
 from PIL import Image
   
@@ -288,9 +289,18 @@ class sign():
     self._provides_logo = provides_logo
     self._is_dynamic = is_dynamic
     self._preferred_duration = preferred_duration
-      
+
     self.setup_properties()
     self.handle_command_line()
+
+    signal.signal(signal.SIGTERM,self.clean_shutdown)
+    signal.signal(signal.SIGINT,self.clean_shutdown)
+
+  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def clean_shutdown(self,signum,dataframe):
+    # free resources, etc. also catch "error" of sudden exit
+    sys.exit()
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

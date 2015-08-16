@@ -1,10 +1,9 @@
 # farnsworth
+---
 text and graphics library for openpixelcontrol-compatible LED signage
 
+##configuration
 ---
-
-###configuration
-
 general, systemwide configuration is accomplished by editing the
 config.py file
 
@@ -63,3 +62,23 @@ decimal seconds
 ```python
 TIME_SLICE = 5.0
 ```
+
+##invocation
+---
+run the start_jukebox.sh script to initialize farnsworth. by default,
+farnsworth's jukebox provides an interactive curses interface. if your
+terminal is too small, you'll be limited to non-interactive silent mode.
+
+###interactive mode
+---
+interactive mode exposes the jukebox's internal state and allows you to
+control it manually as desired.
+
+key | function
+--------------
+q | shutdown the farnsworth system
+r | rescan hacks folder so as to make newly-added hacks available
+m | toggle manual mode, in which each hack runs until a new one is selected
+<enter> | stop the current hack and (re)load the highlighted one
+<down arrow> | move the hack selection downwards
+<up arrow> | move the hack selection upwards
