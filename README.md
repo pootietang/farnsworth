@@ -1,12 +1,8 @@
 # farnsworth
 ---
-text and graphics library for openpixelcontrol-compatible LED signage
-
-##overview
----
-the jukebox script finds, loads, and cycles through the individual
-hack scripts stored in the hacks folder. the farnsworth library provides
-the individual hack scripts with common functionality such as text
+the central jukebox script cycles through the individual hack scripts
+stored in the hacks folder. the farnsworth library provides the
+individual hack scripts with common functionality such as character
 generation, bitmap loading, and sprites with animation and tweening.
 
 ##configuration
