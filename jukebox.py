@@ -46,6 +46,7 @@ found_dynamic = False
 hack_run_count = 0
 hack_index = 0
 manual = False
+total_odds = 1
 
 ########################################################################
 
@@ -101,7 +102,8 @@ def paint_hack_list():
 		m = ">"
 
     this_hack = screenhacks[cursor]
-    t = "%s[R:%s O:%s] %s" % ( m, this_hack["run_count"], this_hack["odds"], this_hack["name"] )
+    odds = this_hack["odds"] * 1.0 / total_odds
+    t = "%s[R:%s O:%.2f] %s" % ( m, this_hack["run_count"], odds, this_hack["name"] )
     w = MAX_X - (len(t)+HACK_WINDOW_X*2)
     t = t + " " * w
     t = t[:HACK_WINDOW_W]
@@ -249,11 +251,13 @@ def register_hack( path ):
 ########################################################################
 
 def random_hack_id():
+  global total_odds
 
   hack_id = 0
   totals = []
   running_total = 0
 
+  total_odds = 0
   for i in range( len(screenhacks) ):
     h = screenhacks[i]
     if hack_run_count == 0 or h["run_count"] == 0:
@@ -262,6 +266,7 @@ def random_hack_id():
       h["odds"] = 0
     else:
       h["odds"] = int(((hack_run_count - h["run_count"]) * 100) / hack_run_count)
+    total_odds += h["odds"]
 
     running_total += h["odds"]
     totals.append(running_total)

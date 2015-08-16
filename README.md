@@ -76,6 +76,10 @@ terminal is too small, you'll be limited to non-interactive silent mode.
 interactive mode exposes the jukebox's internal state and allows you to
 control it manually as desired.
 
+each hack in the listing is preceded by two properties:
+* **R**un count -- how many times this hack has been displayed so far
+* **O**dds -- likelihood of this hack being displayed next
+
 key | function
 ----|---------
 q | shutdown the farnsworth system
