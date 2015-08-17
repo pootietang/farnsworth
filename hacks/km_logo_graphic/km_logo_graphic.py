@@ -9,7 +9,7 @@ sign = farnsworth.sign( provides_logo=True,
                         preferred_duration=5.0 )
                         
 logo = sign.locate_file('km_logo.bmp')
-sign.front_layer().load_from_image(logo)
+sign.front_layer().load_from_filename(logo)
 
 while True:
   sign.paint()

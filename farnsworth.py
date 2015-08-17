@@ -20,13 +20,15 @@ import config
 
 class layer():
 
-  def __init__(self, width=0, height=0, filename=None):
+  def __init__(self, width=0, height=0, filename=None, image=None, scale_x_to=None, scale_y_to=None):
 
     self._data = []
     self._dirty = True
 
     if filename:
-      self.load_from_image(filename)
+      self.load_from_filename(filename, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
+    elif image:
+      self.load_from_image(image, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
     else:
       self._width = width
       self._height = height
@@ -113,12 +115,22 @@ class layer():
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def load_from_image( self, filename ):
+  def load_from_filename( self, filename, scale_x_to=None, scale_y_to=None ):
 
     im = Image.open(filename)
-    pixels = im.load()
-    self._width, self._height = im.size
-    
+    self.load_from_image( im, scale_x_to=scale_x_to, scale_y_to=scale_y_to )
+
+  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def load_from_image( self, image, scale_x_to=None, scale_y_to=None ):
+
+    rgb_image = image.convert('RGB')
+    if scale_x_to or scale_y_to:
+      w = scale_x_to if scale_x_to else config.PIXELS_ACROSS
+      h = scale_y_to if scale_y_to else config.PIXELS_HIGH
+      rgb_image.thumbnail((w,h), Image.ANTIALIAS)
+    pixels = rgb_image.load()
+    self._width, self._height = rgb_image.size
     for y in range(0,self._height):
       row = []
       for x in range(0,self._width):
@@ -268,16 +280,6 @@ class layer():
                         string2_font_name,
                         string2,
                         string2_rgb_color)
-
-#=======================================================================
-
-class scroller(layer):
-
-  def __init__(self):
-    super(scroller,self).__init__()
-    
-  def paint(self):
-    pass
 
 #=======================================================================
 
@@ -560,7 +562,7 @@ class clock():
 
 class sprite(layer):
 
-  def __init__(self, base_image):
+  def __init__(self, base_image=None, gif_source=None, scale_x_to=None, scale_y_to=None):
 
     self._x = 0
     self._y = 0
@@ -571,13 +573,31 @@ class sprite(layer):
     self._images = []
     self._image_cursor = 0
     self._cursor_increment = 1
-    self.add_image(base_image)
+
+    if base_image:
+      self.add_image(base_image, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
+    elif gif_source:
+      self.load_from_gif(gif_source, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def add_image(self, filename):
+  def load_from_gif(self, filename, scale_x_to=None, scale_y_to=None):
 
-    self._images.append( layer(filename=filename) )
+    i = 0
+    gif = Image.open(filename)
+    while gif:
+      try:
+        self._images.append( layer(image=gif, scale_x_to=scale_x_to, scale_y_to=scale_y_to) )
+        gif.seek( gif.tell()+1 )
+        i += 1
+      except EOFError:
+        break
+
+  #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def add_image(self, filename, scale_x_to=None, scale_y_to=None):
+
+    self._images.append( layer(filename=filename, scale_x_to=scale_x_to, scale_y_to=scale_y_to) )
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
