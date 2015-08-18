@@ -2,6 +2,7 @@
 
 import farnsworth
 import config
+import constants
 
 sign = farnsworth.sign( provides_logo=False,
                         is_dynamic=True,
@@ -14,7 +15,7 @@ clock = farnsworth.clock(0.1)
 
 while True:
 
-  sign.front_layer().blank()
+  sign.front_layer().blank(constants.COLORS["WHITE"])
 
   if clock.tick():
     #cat.cycle_image()

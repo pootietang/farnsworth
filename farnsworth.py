@@ -20,15 +20,15 @@ import config
 
 class layer():
 
-  def __init__(self, width=0, height=0, filename=None, image=None, scale_x_to=None, scale_y_to=None):
+  def __init__(self, width=0, height=0, filename=None, image=None, scale_x_to=None, scale_y_to=None, xparent_color=None):
 
     self._data = []
     self._dirty = True
 
     if filename:
-      self.load_from_filename(filename, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
+      self.load_from_filename(filename, scale_x_to=scale_x_to, scale_y_to=scale_y_to, xparent_color=xparent_color)
     elif image:
-      self.load_from_image(image, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
+      self.load_from_image(image, scale_x_to=scale_x_to, scale_y_to=scale_y_to, xparent_color=xparent_color)
     else:
       self._width = width
       self._height = height
@@ -115,15 +115,20 @@ class layer():
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def load_from_filename( self, filename, scale_x_to=None, scale_y_to=None ):
+  def load_from_filename( self, filename, scale_x_to=None, scale_y_to=None, xparent_color=None ):
 
     im = Image.open(filename)
-    self.load_from_image( im, scale_x_to=scale_x_to, scale_y_to=scale_y_to )
+    self.load_from_image( im, scale_x_to=scale_x_to, scale_y_to=scale_y_to, xparent_color=xparent_color )
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def load_from_image( self, image, scale_x_to=None, scale_y_to=None ):
+  def load_from_image( self, image, scale_x_to=None, scale_y_to=None, xparent_color=None ):
 
+    alpha = None
+    if image.mode in ('RGBA', 'LA') or (image.mode == 'P' and 'transparency' in image.info):
+      a = image.convert('RGBA').split()[-1]
+      alpha = a.load()
+    
     rgb_image = image.convert('RGB')
     if scale_x_to or scale_y_to:
       w = scale_x_to if scale_x_to else config.PIXELS_ACROSS
@@ -139,7 +144,8 @@ class layer():
 
     for y in range(0,self._height):
       for x in range(0,self._width):
-        self.set_pixel(x, self._height - (y+1), pixels[(x,y)])
+        if (not alpha or alpha[(x,y)] > 0) and (not xparent_color or (xparent_color <> pixels[x,y])):
+          self.set_pixel(x, self._height - (y+1), pixels[(x,y)])
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -562,7 +568,7 @@ class clock():
 
 class sprite(layer):
 
-  def __init__(self, base_image=None, gif_source=None, scale_x_to=None, scale_y_to=None):
+  def __init__(self, base_image=None, gif_source=None, scale_x_to=None, scale_y_to=None, xparent_color=None):
 
     self._x = 0
     self._y = 0
@@ -575,19 +581,19 @@ class sprite(layer):
     self._cursor_increment = 1
 
     if base_image:
-      self.add_image(base_image, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
+      self.add_image(base_image, scale_x_to=scale_x_to, scale_y_to=scale_y_to, xparent_color=xparent_color)
     elif gif_source:
-      self.load_from_gif(gif_source, scale_x_to=scale_x_to, scale_y_to=scale_y_to)
+      self.load_from_gif(gif_source, scale_x_to=scale_x_to, scale_y_to=scale_y_to, xparent_color=xparent_color)
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def load_from_gif(self, filename, scale_x_to=None, scale_y_to=None):
+  def load_from_gif(self, filename, scale_x_to=None, scale_y_to=None, xparent_color=None):
 
     i = 0
     gif = Image.open(filename)
     while gif:
       try:
-        self._images.append( layer(image=gif, scale_x_to=scale_x_to, scale_y_to=scale_y_to) )
+        self._images.append( layer(image=gif, scale_x_to=scale_x_to, scale_y_to=scale_y_to, xparent_color=xparent_color) )
         gif.seek( gif.tell()+1 )
         i += 1
       except EOFError:
@@ -595,9 +601,9 @@ class sprite(layer):
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def add_image(self, filename, scale_x_to=None, scale_y_to=None):
+  def add_image(self, filename, scale_x_to=None, scale_y_to=None, xparent_color=None):
 
-    self._images.append( layer(filename=filename, scale_x_to=scale_x_to, scale_y_to=scale_y_to) )
+    self._images.append( layer(filename=filename, scale_x_to=scale_x_to, scale_y_to=scale_y_to, xparent_color=xparent_color) )
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
