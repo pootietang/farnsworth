@@ -574,7 +574,9 @@ class sprite(layer):
   def __init__(self, base_image=None, gif_source=None, scale_x_to=None, scale_y_to=None, xparent_color=None):
 
     self._x = 0
+    self._x_float = 0
     self._y = 0
+    self._y_float = 0
     self._dest_x = 0
     self._dest_y = 0
     self._x_inc = 0
@@ -620,7 +622,9 @@ class sprite(layer):
   def move_to(self, x, y):
 
     self._x = x
+    self._x_float = x
     self._y = y
+    self._y_float = y
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -631,17 +635,17 @@ class sprite(layer):
     
     if self._dest_x <> self._x:
       self._x_inc = (self._dest_x - self._x) / framecount
-      if self._x_inc > 0 and self._x_inc < 1:
-        self._x_inc = 1
-      elif self._x_inc < 0 and self._x_inc > -1:
-        self._x_inc = -1
+      #if self._x_inc > 0 and self._x_inc < 1:
+      #  self._x_inc = 1
+      #elif self._x_inc < 0 and self._x_inc > -1:
+      #  self._x_inc = -1
     
     if self._dest_y <> self._y:
       self._y_inc = (self._dest_y - self._y) / framecount
-      if self._y_inc > 0 and self._y_inc < 1:
-        self._y_inc = 1
-      elif self._y_inc < 0 and self._y_inc > -1:
-        self._y_inc = -1
+      #if self._y_inc > 0 and self._y_inc < 1:
+      #  self._y_inc = 1
+      #elif self._y_inc < 0 and self._y_inc > -1:
+      #  self._y_inc = -1
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -667,14 +671,16 @@ class sprite(layer):
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def tween(self):
-
-    self._x = int(self._x + self._x_inc)
+    
+    self._x_float = self._x_float + self._x_inc
+    self._x = int(self._x_float)
     if ((self._x_inc > 0) and (self._x >= self._dest_x)) or ((self._x_inc < 0) and (self._x <= self._dest_x)):
       #done animating x
       self._x_inc = 0
       self._dest_x = self._x
       
-    self._y = int(self._y + self._y_inc)
+    self._y_float = self._y_float + self._y_inc
+    self._y = int(self._y_float)
     if ((self._y_inc > 0) and (self._y >= self._dest_y)) or ((self._y_inc < 0) and (self._y <= self._dest_y)):
       #done animating y
       self._y_inc = 0
