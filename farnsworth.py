@@ -52,6 +52,7 @@ class layer():
     for y in range(0,self._height):
       for x in range(0,self._width):
         self._data[y][x] = rgb_color
+    self._dirty = True
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -158,6 +159,8 @@ class layer():
     for by in range(0,h):
       for bx in range(0,w):
         self.set_pixel(bx + x, y + h - (by+1), pixels[(bx,by)])
+    
+    self._is_dirty = True
 
   #- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   

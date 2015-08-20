@@ -4,8 +4,8 @@ import constants
 
 #=======================================================================
 
-#IP_ADDRESS = '172.16.250.3'
-IP_ADDRESS = 'localhost'
+IP_ADDRESS = '172.16.250.3'
+#IP_ADDRESS = 'localhost'
 PORT = 7890
 
 FPS = 30

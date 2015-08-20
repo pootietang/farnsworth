@@ -8,8 +8,10 @@ sign = farnsworth.sign( provides_logo=False,
                         preferred_duration=5.0 )
                         
 science = sign.locate_file('science.bmp')
-sign.front_layer().load_from_filename(science)
+s = farnsworth.sprite(base_image=science)
 
 while True:
+  sign.front_layer().blank()
+  s.paint( sign.front_layer() )
   sign.paint()
   sleep(0.1)
